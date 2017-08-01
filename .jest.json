@@ -1,0 +1,10 @@
+{
+  "collectCoverage": true,
+  "collectCoverageFrom" : ["plugin.js"],
+  "coveragePathIgnorePatterns": ["node_modules/","coverage/"],
+  "testMatch": [
+    "<rootDir>/test/***.spec.js"
+  ],
+  "mapCoverage": true,
+  "clearMocks": true
+}

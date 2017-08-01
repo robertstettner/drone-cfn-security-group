@@ -1,0 +1,39 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: {{name}}
+
+
+Resources:
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "{{description}}"
+      VpcId: {{VpcId}}
+      {{#if SecurityGroupIngress}}
+      SecurityGroupIngress:
+      {{#each SecurityGroupIngress}}
+      - CidrIp: {{CidrIp}}
+        FromPort: {{FromPort}}
+        ToPort: {{ToPort}}
+        IpProtocol: {{IpProtocol}}
+      {{/each}}
+      {{/if}}
+      {{#if SecurityGroupEgress}}
+      SecurityGroupEgress:
+      {{#each SecurityGroupEgress}}
+      - CidrIp: {{CidrIp}}
+        FromPort: {{FromPort}}
+        ToPort: {{ToPort}}
+        IpProtocol: {{IpProtocol}}
+      {{/each}}
+      {{/if}}
+
+
+Outputs:
+
+  SecurityGroup:
+    Value: !Ref SecurityGroup
+    Description: "{{description}}"
+    Export:
+      Name: !Ref AWS::StackName
