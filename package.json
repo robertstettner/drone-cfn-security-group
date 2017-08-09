@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "bluebird": "3.5.0",
-    "cfn": "robertstettner/cfn#add-validate"
+    "cfn": "1.2.0",
+    "handlebars": "4.0.10"
   }
 }
