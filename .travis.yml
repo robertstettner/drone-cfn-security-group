@@ -9,7 +9,7 @@ node_js: 6
 
 after_success:
   - npm run coverage
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "push" ]]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
     docker build . -t robertstettner/drone-cfn-security-group;
     docker push robertstettner/drone-cfn-security-group;
