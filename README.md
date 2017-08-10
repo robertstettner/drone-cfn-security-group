@@ -15,7 +15,7 @@ The following parameters are used to configure the plugin:
 - `exportname`: the name of the CloudFormation stack and export. Required.
 - `vpcid`: the VPC Id to associate the Security Group to. 
   This can be a exported value, in CloudFormation eg. `!ImportValue MyAppVpcId`. Required.
-- `description`: the description of the CloudFormation stack. Optional.
+- `description`: the description of the CloudFormation stack. Required.
 - `ingress_cidrs`: ingress CIDR ranges. Optional.
 - `ingress_ports`: array of ingress ports as numbers or objects with 
   parameters (`from_port`, `to_port`, `protocol`). Optional.
@@ -35,7 +35,7 @@ pipeline:
   security:
     image: robertstettner/drone-cfn-security-group
     pull: true
-    name: MyApplicationSecurityGroup
+    exportname: MyApplicationSecurityGroup
     ingress_cidrs:
       - 54.123.32.123/32
       - 67.2.34.3/32
@@ -66,7 +66,7 @@ pipeline:
   security:
     image: robertstettner/drone-cfn-security-group
     pull: true
-    name: MyApplicationSecurityGroup
+    exportname: MyApplicationSecurityGroup
     ingress_cidrs:
       - 54.123.32.123/32
       - 67.2.34.3/32

@@ -28,6 +28,10 @@ let validateConfig = env => {
     if (!env.PLUGIN_EXPORTNAME) {
         throw new Error('exportname not specified');
     }
+
+    if (!env.PLUGIN_DESCRIPTION) {
+        throw new Error('description not specified');
+    }
     
     if (!env.PLUGIN_VPCID) {
         throw new Error('vpcid not specified');
@@ -63,7 +67,7 @@ let isValidPorts = ports => {
 let convertParams = (params, list) => {
     const convertedParams = JSON.parse(JSON.stringify(params));
     list.forEach(item => {
-        convertedParams[item] = convertParam(params[item]);
+        if (params.hasOwnProperty(item)) convertedParams[item] = convertParam(params[item]);
     });
     return convertedParams;
 };
@@ -84,8 +88,8 @@ let convertParam = param => {
 
 let mapCidrsPorts = (cidrs, ports) => {
     const data = [];
-    cidrs = [].concat(cidrs);
-    ports = [].concat(ports);
+    cidrs = Array.isArray(cidrs) ? cidrs : [];
+    ports = Array.isArray(ports) ? ports : [];
     for (let i = 0; i < cidrs.length; i+=1) {
         for (let j = 0; j < ports.length; j+=1) {
             const obj = {

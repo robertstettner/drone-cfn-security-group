@@ -38,28 +38,38 @@ describe('Unit tests: Drone CloudFormation Security Group Plugin', () => {
         test('should throw error when exportname not specified', () => {
             expect(() => validateConfig({})).toThrowError('exportname not specified');
         });
-        test('should throw error when vpcid not specified', () => {
+        test('should throw error when description not specified', () => {
             expect(() => validateConfig({
                 PLUGIN_EXPORTNAME: 'MyStack'
+            })).toThrowError('description not specified');
+        });
+        test('should throw error when vpcid not specified', () => {
+            expect(() => validateConfig({
+                PLUGIN_EXPORTNAME: 'MyStack',
+                PLUGIN_DESCRIPTION: 'MyStack'
             })).toThrowError('vpcid not specified');
         });
         test('should return env back when not specifying ports', () => {
             expect(validateConfig({
                 PLUGIN_EXPORTNAME: 'MyStack',
+                PLUGIN_DESCRIPTION: 'MyStack',
                 PLUGIN_VPCID: '!ImportValue MyVPCId'
             })).toEqual({
                 PLUGIN_EXPORTNAME: 'MyStack',
+                PLUGIN_DESCRIPTION: 'MyStack',
                 PLUGIN_VPCID: '!ImportValue MyVPCId'
             });
         });
         test('should return env back when specifying ports', () => {
             expect(validateConfig({
                 PLUGIN_EXPORTNAME: 'MyStack',
+                PLUGIN_DESCRIPTION: 'MyStack',
                 PLUGIN_VPCID: '!ImportValue MyVPCId',
                 PLUGIN_INGRESS_PORTS: '80,443',
                 PLUGIN_EGRESS_PORTS: '80,443'
             })).toEqual({
                 PLUGIN_EXPORTNAME: 'MyStack',
+                PLUGIN_DESCRIPTION: 'MyStack',
                 PLUGIN_VPCID: '!ImportValue MyVPCId',
                 PLUGIN_INGRESS_PORTS: '80,443',
                 PLUGIN_EGRESS_PORTS: '80,443'
@@ -99,6 +109,29 @@ describe('Unit tests: Drone CloudFormation Security Group Plugin', () => {
                 not_included: 'boohoo',
                 obj: '{"foo":"bar"}'
             }, ['ips','obj']);
+            const expected = {
+                ips: 'hello',
+                not_included: 'boohoo',
+                obj: 'hello'
+            };
+
+            expect(convertParamMock).toHaveBeenCalledTimes(2);
+            expect(convertParamMock.mock.calls[0]).toEqual(['112.23.4.24/32,5.23.5.1/32,230.2.43.0/24']);
+            expect(convertParamMock.mock.calls[1]).toEqual(['{"foo":"bar"}']);
+            expect(actual).toEqual(expected);
+
+            revert();
+        });
+        test('should return converted parameters without ones that don\'t exist', () => {
+            const convertParamMock = jest.fn();
+            convertParamMock.mockReturnValue('hello');
+            const revert = plugin.__set__('convertParam', convertParamMock);
+
+            const actual = convertParams({
+                ips: '112.23.4.24/32,5.23.5.1/32,230.2.43.0/24',
+                not_included: 'boohoo',
+                obj: '{"foo":"bar"}'
+            }, ['ips','obj','nonexistent']);
             const expected = {
                 ips: 'hello',
                 not_included: 'boohoo',
@@ -155,6 +188,20 @@ describe('Unit tests: Drone CloudFormation Security Group Plugin', () => {
 
     describe('mapCidrsPorts()', () => {
         const mapCidrsPorts = plugin.__get__('mapCidrsPorts');
+        test('should return empty array when ports is not an array', () => {
+            const actual = mapCidrsPorts(['112.23.4.24/32','5.23.5.1/32','230.2.43.0/24'],'notanarray');
+            const expected = [];
+
+            expect(actual).toHaveLength(0);
+            expect(actual).toEqual(expect.arrayContaining(expected));
+        });
+        test('should return empty array when cidrs is not an array', () => {
+            const actual = mapCidrsPorts('notanarray',[80,443]);
+            const expected = [];
+
+            expect(actual).toHaveLength(0);
+            expect(actual).toEqual(expect.arrayContaining(expected));
+        });
         test('should return mapped out collection when ports are numbers', () => {
             const actual = mapCidrsPorts(['112.23.4.24/32','5.23.5.1/32','230.2.43.0/24'],[80,443]);
             const expected = [{"CidrIp": "112.23.4.24/32", "FromPort": 80, "IpProtocol": "-1", "ToPort": 80}, {"CidrIp": "112.23.4.24/32", "FromPort": 443, "IpProtocol": "-1", "ToPort": 443}, {"CidrIp": "5.23.5.1/32", "FromPort": 80, "IpProtocol": "-1", "ToPort": 80}, {"CidrIp": "5.23.5.1/32", "FromPort": 443, "IpProtocol": "-1", "ToPort": 443}, {"CidrIp": "230.2.43.0/24", "FromPort": 80, "IpProtocol": "-1", "ToPort": 80}, {"CidrIp": "230.2.43.0/24", "FromPort": 443, "IpProtocol": "-1", "ToPort": 443}];
