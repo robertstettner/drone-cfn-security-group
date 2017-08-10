@@ -25,8 +25,8 @@ let validateConfig = env => {
         throw new Error('drone YAML is unverified when not using AWS IAM role');
     }
 
-    if (!env.PLUGIN_NAME) {
-        throw new Error('name not specified');
+    if (!env.PLUGIN_EXPORTNAME) {
+        throw new Error('exportname not specified');
     }
     
     if (!env.PLUGIN_VPCID) {
@@ -110,7 +110,7 @@ let generateData = env => {
     const SecurityGroupIngress = mapCidrsPorts(env.PLUGIN_INGRESS_CIDRS, env.PLUGIN_INGRESS_PORTS);
     const SecurityGroupEgress = mapCidrsPorts(env.PLUGIN_EGRESS_CIDRS, env.PLUGIN_EGRESS_PORTS);
     const data = {
-        name: env.PLUGIN_NAME,
+        name: env.PLUGIN_EXPORTNAME,
         description: env.PLUGIN_DESCRIPTION,
         VpcId: env.PLUGIN_VPCID
     };
@@ -128,7 +128,7 @@ let generateTemplate = data => {
 
 let createDeployConfig = env => {
     const config = {
-        name: env.PLUGIN_NAME,
+        name: env.PLUGIN_EXPORTNAME,
         template: path.join(__dirname, 'template.yml'),
         awsConfig: {
             region: env.PLUGIN_REGION || 'eu-west-1'

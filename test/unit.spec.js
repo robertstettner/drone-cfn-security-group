@@ -35,31 +35,31 @@ describe('Unit tests: Drone CloudFormation Security Group Plugin', () => {
                 DRONE_YAML_VERIFIED: false
             })).toThrowError('drone YAML is unverified when not using AWS IAM role');
         });
-        test('should throw error when name not specified', () => {
-            expect(() => validateConfig({})).toThrowError('name not specified');
+        test('should throw error when exportname not specified', () => {
+            expect(() => validateConfig({})).toThrowError('exportname not specified');
         });
         test('should throw error when vpcid not specified', () => {
             expect(() => validateConfig({
-                PLUGIN_NAME: 'MyStack'
+                PLUGIN_EXPORTNAME: 'MyStack'
             })).toThrowError('vpcid not specified');
         });
         test('should return env back when not specifying ports', () => {
             expect(validateConfig({
-                PLUGIN_NAME: 'MyStack',
+                PLUGIN_EXPORTNAME: 'MyStack',
                 PLUGIN_VPCID: '!ImportValue MyVPCId'
             })).toEqual({
-                PLUGIN_NAME: 'MyStack',
+                PLUGIN_EXPORTNAME: 'MyStack',
                 PLUGIN_VPCID: '!ImportValue MyVPCId'
             });
         });
         test('should return env back when specifying ports', () => {
             expect(validateConfig({
-                PLUGIN_NAME: 'MyStack',
+                PLUGIN_EXPORTNAME: 'MyStack',
                 PLUGIN_VPCID: '!ImportValue MyVPCId',
                 PLUGIN_INGRESS_PORTS: '80,443',
                 PLUGIN_EGRESS_PORTS: '80,443'
             })).toEqual({
-                PLUGIN_NAME: 'MyStack',
+                PLUGIN_EXPORTNAME: 'MyStack',
                 PLUGIN_VPCID: '!ImportValue MyVPCId',
                 PLUGIN_INGRESS_PORTS: '80,443',
                 PLUGIN_EGRESS_PORTS: '80,443'
@@ -189,7 +189,7 @@ describe('Unit tests: Drone CloudFormation Security Group Plugin', () => {
                 .mockReturnValueOnce('second call');
             const revert = plugin.__set__('mapCidrsPorts', mapCidrsPortsMock);
             const actual = generateData({
-                PLUGIN_NAME: 'MyAppSecurityGroup',
+                PLUGIN_EXPORTNAME: 'MyAppSecurityGroup',
                 PLUGIN_DESCRIPTION: 'Allows port 80 from certain IPs for MyApp',
                 PLUGIN_VPCID: '!ImportValue MyAppVpcId',
                 PLUGIN_INGRESS_PORTS: [80,443],
@@ -217,7 +217,7 @@ describe('Unit tests: Drone CloudFormation Security Group Plugin', () => {
             mapCidrsPortsMock.mockReturnValue([]);
             const revert = plugin.__set__('mapCidrsPorts', mapCidrsPortsMock);
             const actual = generateData({
-                PLUGIN_NAME: 'MyAppSecurityGroup',
+                PLUGIN_EXPORTNAME: 'MyAppSecurityGroup',
                 PLUGIN_DESCRIPTION: 'Allows port 80 from certain IPs for MyApp',
                 PLUGIN_VPCID: '!ImportValue MyAppVpcId'
             });
@@ -271,7 +271,7 @@ describe('Unit tests: Drone CloudFormation Security Group Plugin', () => {
         const createDeployConfig = plugin.__get__('createDeployConfig');
         test('should generate deploy config when using specific region and aws access/secret key', () => {
             expect(createDeployConfig({
-                PLUGIN_NAME: 'MyAppSecurityGroup',
+                PLUGIN_EXPORTNAME: 'MyAppSecurityGroup',
                 PLUGIN_DESCRIPTION: 'Allows port 80 from certain IPs for MyApp',
                 PLUGIN_VPCID: '!ImportValue MyAppVpcId',
                 PLUGIN_REGION: 'us-east-1',
@@ -290,7 +290,7 @@ describe('Unit tests: Drone CloudFormation Security Group Plugin', () => {
         });
         test('should generate deploy config with defaults', () => {
             expect(createDeployConfig({
-                PLUGIN_NAME: 'MyAppSecurityGroup',
+                PLUGIN_EXPORTNAME: 'MyAppSecurityGroup',
                 PLUGIN_DESCRIPTION: 'Allows port 80 from certain IPs for MyApp',
                 PLUGIN_VPCID: '!ImportValue MyAppVpcId'
             })()).toEqual({

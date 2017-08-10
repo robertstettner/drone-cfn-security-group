@@ -12,7 +12,7 @@ CloudFormation stack.
 
 The following parameters are used to configure the plugin:
 
-- `name`: the name of the CloudFormation stack. Required.
+- `exportname`: the name of the CloudFormation stack and export. Required.
 - `vpcid`: the VPC Id to associate the Security Group to. 
   This can be a exported value, in CloudFormation eg. `!ImportValue MyAppVpcId`. Required.
 - `description`: the description of the CloudFormation stack. Optional.
